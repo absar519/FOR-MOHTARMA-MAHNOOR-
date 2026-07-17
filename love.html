@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey My Love ❤️</title>
+
+<style>
+/* ============================================================
+   ROOT VARIABLES — dark (default) & light theme tokens
+   Palette: pink (#ff5c8a / #ffb8d1), red (#ff2d55 / #c9184a),
+   black (#0b0710 / #150c14), white (#fff8fb)
+   ============================================================ */
+:root{
+  --bg-1:#0b0710;
+  --bg-2:#1a0e18;
+  --pink:#ff6fa5;
+  --pink-soft:#ffb8d1;
+  --red:#ff2d55;
+  --white:#fff8fb;
+  --glass-bg:rgba(255,255,255,0.07);
+  --glass-border:rgba(255,255,255,0.18);
+  --text-main:#fff8fb;
+  --text-muted:#e8c7d6;
+  --shadow-color:rgba(255,45,85,0.35);
+}
+
+body.light{
+  --bg-1:#fff0f5;
+  --bg-2:#ffd9e6;
+  --glass-bg:rgba(255,255,255,0.55);
+  --glass-border:rgba(255,255,255,0.9);
+  --text-main:#2b0e18;
+  --text-muted:#7a3a4d;
+  --shadow-color:rgba(255,45,85,0.2);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html,body{
+  height:100%;
+  overflow-x:hidden;
+}
+
+body{
+  font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  color:var(--text-main);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,111,165,0.25), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(255,45,85,0.25), transparent 45%),
+    linear-gradient(160deg, var(--bg-1), var(--bg-2));
+  min-height:100vh;
+  transition:background 0.6s ease, color 0.6s ease;
+  position:relative;
+}
+
+/* Elegant display font stack for headings — cursive fallback for romance */
+h1,h2,.script{
+  font-family:'Brush Script MT','Segoe Script','Lucida Handwriting', cursive;
+  font-weight:400;
+}
+
+.eyebrow{
+  font-family:'Georgia', serif;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  font-size:0.7rem;
+  color:var(--pink-soft);
+  opacity:0.85;
+}
+
+/* ============================================================
+   TOP BAR — progress bar + theme toggle + music toggle
+   ============================================================ */
+#topbar{
+  position:fixed;
+  top:0; left:0; right:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 18px;
+  z-index:100;
+}
+
+#progress-track{
+  flex:1;
+  height:8px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.15);
+  overflow:hidden;
+  border:1px solid var(--glass-border);
+}
+
+#progress-fill{
+  height:100%;
+  width:0%;
+  border-radius:20px;
+  background:linear-gradient(90deg, var(--pink), var(--red));
+  transition:width 0.5s ease;
+  box-shadow:0 0 12px var(--shadow-color);
+}
+
+.icon-btn{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  border-radius:50%;
+  border:1px solid var(--glass-border);
+  background:var(--glass-bg);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  color:var(--text-main);
+  font-size:1.1rem;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform 0.25s ease, box-shadow 0.25s ease;
+}
+.icon-btn:hover{ transform:scale(1.1); box-shadow:0 0 16px var(--shadow-color); }
+.icon-btn:active{ transform:scale(0.95); }
+
+/* ============================================================
+   FLOATING HEARTS — ambient background layer
+   ============================================================ */
+#floating-hearts{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:1;
+}
+
+.heart{
+  position:absolute;
+  bottom:-10%;
+  color:var(--pink);
+  opacity:0.7;
+  user-select:none;
+  animation:floatUp linear forwards;
+  filter:drop-shadow(0 0 6px var(--shadow-color));
+}
+
+@keyframes floatUp{
+  0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
+  10%{ opacity:0.8; }
+  100%{ transform:translateY(-110vh) translateX(var(--drift,20px)) rotate(360deg); opacity:0; }
+}
+
+/* ============================================================
+   SCREENS — one visible at a time, centered glass stage
+   ============================================================ */
+#stage{
+  position:relative;
+  z-index:5;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:100px 20px 40px;
+}
+
+.screen{
+  width:100%;
+  max-width:640px;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:22px;
+  text-align:center;
+  animation:screenIn 0.7s ease forwards;
+}
+
+.screen.active{ display:flex; }
+
+@keyframes screenIn{
+  from{ opacity:0; transform:translateY(28px) scale(0.98); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+.glass-card{
+  width:100%;
+  background:var(--glass-bg);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border:1px solid var(--glass-border);
+  border-radius:28px;
+  padding:40px 32px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+h1{ font-size:3rem; color:var(--pink-soft); text-shadow:0 0 20px var(--shadow-color); }
+h2{ font-size:2.2rem; color:var(--pink-soft); }
+
+p.lead{
+  font-size:1.1rem;
+  color:var(--text-muted);
+  line-height:1.6;
+  max-width:480px;
+}
+
+/* Pulsing heart emoji accent */
+.pulse-heart{
+  font-size:2.4rem;
+  animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.2); }
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary{
+  padding:16px 40px;
+  border:none;
+  border-radius:50px;
+  background:linear-gradient(135deg, var(--pink), var(--red));
+  color:#fff;
+  font-size:1.05rem;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 8px 24px var(--shadow-color);
+  transition:transform 0.25s ease, box-shadow 0.25s ease;
+  animation:breathe 2.2s ease-in-out infinite;
+}
+.btn-primary:hover{ transform:translateY(-3px) scale(1.04); box-shadow:0 12px 32px var(--shadow-color); }
+.btn-primary:active{ transform:translateY(0) scale(0.97); }
+.btn-primary:disabled{ opacity:0.4; cursor:not-allowed; animation:none; }
+
+@keyframes breathe{
+  0%,100%{ box-shadow:0 8px 24px var(--shadow-color); }
+  50%{ box-shadow:0 8px 36px var(--shadow-color); }
+}
+
+.btn-secondary{
+  padding:12px 28px;
+  border-radius:50px;
+  border:1px solid var(--glass-border);
+  background:var(--glass-bg);
+  color:var(--text-main);
+  cursor:pointer;
+  font-size:0.95rem;
+  transition:all 0.25s ease;
+}
+.btn-secondary:hover{ background:rgba(255,255,255,0.18); }
+
+/* ============================================================
+   QUESTIONS SECTION
+   ============================================================ */
+.question-input{
+  width:100%;
+  padding:14px 18px;
+  border-radius:16px;
+  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.08);
+  color:var(--text-main);
+  font-size:1.05rem;
+  outline:none;
+  text-align:center;
+  transition:box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.question-input:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 4px var(--shadow-color);
+}
+.question-input::placeholder{ color:var(--text-muted); }
+
+.q-counter{ font-size:0.85rem; color:var(--text-muted); letter-spacing:0.1em; }
+
+/* ============================================================
+   QUIZ SECTION
+   ============================================================ */
+.quiz-choices{
+  display:flex;
+  gap:18px;
+  width:100%;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.choice-btn{
+  flex:1 1 160px;
+  padding:26px 16px;
+  border-radius:22px;
+  border:1px solid var(--glass-border);
+  background:var(--glass-bg);
+  backdrop-filter:blur(16px);
+  color:var(--text-main);
+  font-size:1.15rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+.choice-btn:hover{ transform:translateY(-4px) scale(1.03); box-shadow:0 10px 28px var(--shadow-color); }
+.choice-btn.selected{
+  background:linear-gradient(135deg, var(--pink), var(--red));
+  color:#fff;
+  transform:scale(1.05);
+  box-shadow:0 10px 30px var(--shadow-color);
+}
+.choice-emoji{ display:block; font-size:2rem; margin-bottom:8px; }
+
+/* ============================================================
+   LOVE LETTER SECTION
+   ============================================================ */
+#letter-text{
+  font-family:'Georgia', serif;
+  font-size:1.15rem;
+  line-height:1.9;
+  color:var(--text-main);
+  min-height:170px;
+  text-align:left;
+  white-space:pre-wrap;
+}
+#letter-text .cursor{
+  display:inline-block;
+  width:2px;
+  height:1.1em;
+  background:var(--pink);
+  margin-left:2px;
+  vertical-align:middle;
+  animation:blink 0.8s steps(1) infinite;
+}
+@keyframes blink{ 50%{ opacity:0; } }
+
+.answers-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(140px,1fr));
+  gap:14px;
+  width:100%;
+}
+.answer-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:18px;
+  padding:16px 12px;
+  backdrop-filter:blur(14px);
+  animation:cardPop 0.5s ease forwards;
+  opacity:0;
+}
+@keyframes cardPop{
+  from{ opacity:0; transform:translateY(14px) scale(0.9); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+.answer-card .label{ font-size:0.72rem; letter-spacing:0.08em; color:var(--pink-soft); text-transform:uppercase; }
+.answer-card .value{ font-size:1rem; margin-top:6px; font-weight:600; word-break:break-word; }
+
+/* ============================================================
+   FINAL SCREEN
+   ============================================================ */
+.final-choice-row{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+
+#glow-message{
+  display:none;
+  font-size:1.3rem;
+  font-weight:600;
+  color:var(--white);
+  text-shadow:0 0 12px var(--red), 0 0 28px var(--pink);
+  animation:glowPulse 1.6s ease-in-out infinite;
+}
+@keyframes glowPulse{
+  0%,100%{ text-shadow:0 0 10px var(--red), 0 0 22px var(--pink); }
+  50%{ text-shadow:0 0 22px var(--red), 0 0 45px var(--pink); }
+}
+
+/* Canvas overlays for confetti / fireworks — full screen, click-through */
+#effects-canvas{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:200;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:600px){
+  h1{ font-size:2.2rem; }
+  h2{ font-size:1.7rem; }
+  .glass-card{ padding:28px 20px; border-radius:22px; }
+  .quiz-choices{ gap:12px; }
+  .choice-btn{ flex:1 1 100%; padding:20px 14px; }
+  #stage{ padding:90px 14px 30px; }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient floating hearts layer (populated by JS) -->
+<div id="floating-hearts" aria-hidden="true"></div>
+
+<!-- Fixed top bar: progress + controls -->
+<div id="topbar">
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <button class="icon-btn" id="theme-toggle" title="Toggle dark/light mode">🌙</button>
+  <button class="icon-btn" id="music-toggle" title="Play/pause music">🎵</button>
+</div>
+
+<!-- Full-screen canvas for confetti & fireworks effects -->
+<canvas id="effects-canvas"></canvas>
+
+<main id="stage">
+
+  <!-- 1. WELCOME SCREEN -->
+  <section class="screen active" id="screen-welcome">
+    <div class="glass-card">
+      <div class="pulse-heart">❤️</div>
+      <h1>Hey My Love ❤️</h1>
+      <p class="lead">I made something special just for you.</p>
+      <br>
+      <button class="btn-primary" id="start-btn">Start ✨</button>
+    </div>
+  </section>
+
+  <!-- 2. CUTE QUESTIONS -->
+  <section class="screen" id="screen-questions">
+    <div class="glass-card">
+      <div class="eyebrow">Just for us</div>
+      <h2 id="question-title">Question</h2>
+      <p class="q-counter" id="question-counter">1 / 5</p>
+      <br>
+      <input type="text" class="question-input" id="question-input" placeholder="Type your answer...">
+      <br><br>
+      <button class="btn-primary" id="question-next-btn" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- 3. COUPLE QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="glass-card">
+      <div class="eyebrow">Couple Quiz</div>
+      <h2 id="quiz-title">Pick one</h2>
+      <p class="q-counter" id="quiz-counter">1 / 5</p>
+      <br>
+      <div class="quiz-choices" id="quiz-choices"></div>
+    </div>
+  </section>
+
+  <!-- 4. LOVE LETTER -->
+  <section class="screen" id="screen-letter">
+    <div class="glass-card">
+      <div class="eyebrow">A little letter</div>
+      <h2>For You</h2>
+      <div id="letter-text"></div>
+      <br>
+      <div class="answers-grid" id="answers-grid"></div>
+      <br>
+      <button class="btn-primary" id="letter-next-btn" style="display:none;">Continue →</button>
+    </div>
+  </section>
+
+  <!-- 5. FINAL SCREEN -->
+  <section class="screen" id="screen-final">
+    <div class="glass-card">
+      <div class="pulse-heart">💍</div>
+      <h2>I have one last question...</h2>
+      <p class="lead">Will you keep making beautiful memories with me?</p>
+      <br>
+      <div class="final-choice-row">
+        <button class="btn-primary" id="btn-always">❤️ Always</button>
+        <button class="btn-primary" id="btn-forever">🥰 Forever</button>
+      </div>
+      <br>
+      <div id="glow-message">I love you endlessly. Thank you for being my favorite person. ❤️</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
+// Ordered list of screens the journey moves through
+const SCREEN_ORDER = ['screen-welcome','screen-questions','screen-quiz','screen-letter','screen-final'];
+
+// Total discrete "steps" for the progress bar:
+// 1 welcome + 5 questions + 5 quiz + 1 letter + 1 final = 13
+const TOTAL_STEPS = 13;
+let currentStepIndex = 0; // drives the progress bar
+
+// Cute questions data
+const QUESTIONS = [
+  { key:'nickname',  title:"What's your nickname?" },
+  { key:'flower',    title:"What's your favorite flower?" },
+  { key:'dessert',   title:"What's your favorite dessert?" },
+  { key:'season',    title:"Which season do you like the most?" },
+  { key:'travel',    title:"Where should we travel together?" }
+];
+let questionIndex = 0;
+
+// Couple quiz data: each item has two options {emoji, label}
+const QUIZ = [
+  { key:'place',  title:'Beach or Mountains?', a:{emoji:'🏖️',label:'Beach'}, b:{emoji:'🏔️',label:'Mountains'} },
+  { key:'time',   title:'Morning or Night?',   a:{emoji:'🌅',label:'Morning'}, b:{emoji:'🌙',label:'Night'} },
+  { key:'affection', title:'Hug or Kiss?',     a:{emoji:'🤗',label:'Hug'}, b:{emoji:'😘',label:'Kiss'} },
+  { key:'date',   title:'Movie Date or Dinner Date?', a:{emoji:'🎬',label:'Movie Date'}, b:{emoji:'🍽️',label:'Dinner Date'} },
+  { key:'lifestyle', title:'Stay Home or Travel?', a:{emoji:'🏡',label:'Stay Home'}, b:{emoji:'✈️',label:'Travel'} }
+];
+let quizIndex = 0;
+
+// Persisted answers (also mirrored into localStorage)
+let answers = {};
+let quizAnswers = {};
+
+const LOVE_LETTER_TEXT = "Every day with you is my favorite day. Thank you for being part of my life, for making me smile, and for filling my heart with happiness. I love you today, tomorrow, and always. ❤️";
+
+/* ============================================================
+   LOCAL STORAGE HELPERS
+   ============================================================ */
+function saveAnswersToStorage(){
+  try{
+    localStorage.setItem('love_answers', JSON.stringify(answers));
+    localStorage.setItem('love_quiz_answers', JSON.stringify(quizAnswers));
+  }catch(e){ /* localStorage unavailable — fail silently, app still works */ }
+}
+
+function loadAnswersFromStorage(){
+  try{
+    const a = localStorage.getItem('love_answers');
+    const q = localStorage.getItem('love_quiz_answers');
+    if(a) answers = JSON.parse(a);
+    if(q) quizAnswers = JSON.parse(q);
+  }catch(e){ /* ignore corrupt/missing data */ }
+}
+
+/* ============================================================
+   SCREEN NAVIGATION
+   ============================================================ */
+function showScreen(id){
+  SCREEN_ORDER.forEach(sid=>{
+    const el = document.getElementById(sid);
+    if(!el) return;
+    el.classList.toggle('active', sid === id);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateProgress(){
+  const pct = Math.min(100, Math.round((currentStepIndex / (TOTAL_STEPS-1)) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function advanceStep(){
+  currentStepIndex = Math.min(TOTAL_STEPS-1, currentStepIndex+1);
+  updateProgress();
+}
+
+/* ============================================================
+   FLOATING HEARTS BACKGROUND
+   ============================================================ */
+const HEART_CHARS = ['❤️','💖','💗','💕','💓'];
+
+function spawnFloatingHeart(burst){
+  const container = document.getElementById('floating-hearts');
+  const heart = document.createElement('span');
+  heart.className = 'heart';
+  heart.textContent = HEART_CHARS[Math.floor(Math.random()*HEART_CHARS.length)];
+  const size = 14 + Math.random()*22;
+  const left = Math.random()*100;
+  const duration = 6 + Math.random()*6;
+  const drift = (Math.random()*140 - 70) + 'px';
+  heart.style.left = left + 'vw';
+  heart.style.fontSize = size + 'px';
+  heart.style.setProperty('--drift', drift);
+  heart.style.animationDuration = duration + 's';
+  container.appendChild(heart);
+  setTimeout(()=> heart.remove(), duration*1000 + 200);
+}
+
+// Continuous gentle stream of hearts in the background
+setInterval(()=> spawnFloatingHeart(false), 900);
+
+// Burst of extra hearts for celebration moments
+function heartBurst(count){
+  for(let i=0;i<count;i++){
+    setTimeout(()=> spawnFloatingHeart(true), i*60);
+  }
+}
+
+/* ============================================================
+   THEME TOGGLE (dark / light)
+   ============================================================ */
+const themeBtn = document.getElementById('theme-toggle');
+themeBtn.addEventListener('click', ()=>{
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  themeBtn.textContent = isLight ? '☀️' : '🌙';
+});
+
+/* ============================================================
+   BACKGROUND MUSIC — generated softly with Web Audio API
+   (No external audio file needed, works fully offline)
+   ============================================================ */
+let audioCtx = null;
+let musicPlaying = false;
+let musicNodes = [];
+let musicInterval = null;
+
+// A gentle looping arpeggio in a warm major scale
+const MELODY_NOTES = [523.25, 659.25, 783.99, 659.25, 523.25, 587.33, 659.25, 523.25]; // C5,E5,G5,E5,C5,D5,E5,C5
+
+function initAudio(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playNote(freq, time, duration){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(0.06, time + 0.05);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(time);
+  osc.stop(time + duration + 0.05);
+}
+
+function startMusicLoop(){
+  let step = 0;
+  // Schedule notes repeatedly, one every 0.55s
+  musicInterval = setInterval(()=>{
+    if(!audioCtx) return;
+    const freq = MELODY_NOTES[step % MELODY_NOTES.length];
+    playNote(freq, audioCtx.currentTime, 0.9);
+    step++;
+  }, 550);
+}
+
+function stopMusicLoop(){
+  if(musicInterval){ clearInterval(musicInterval); musicInterval = null; }
+}
+
+const musicBtn = document.getElementById('music-toggle');
+musicBtn.addEventListener('click', ()=>{
+  initAudio();
+  if(!musicPlaying){
+    audioCtx.resume();
+    startMusicLoop();
+    musicPlaying = true;
+    musicBtn.textContent = '⏸️';
+  } else {
+    stopMusicLoop();
+    audioCtx.suspend();
+    musicPlaying = false;
+    musicBtn.textContent = '🎵';
+  }
+});
+
+/* ============================================================
+   1. WELCOME → START
+   ============================================================ */
+document.getElementById('start-btn').addEventListener('click', ()=>{
+  advanceStep();
+  showScreen('screen-questions');
+  renderQuestion();
+});
+
+/* ============================================================
+   2. CUTE QUESTIONS
+   ============================================================ */
+const qTitle = document.getElementById('question-title');
+const qCounter = document.getElementById('question-counter');
+const qInput = document.getElementById('question-input');
+const qNextBtn = document.getElementById('question-next-btn');
+
+function renderQuestion(){
+  const q = QUESTIONS[questionIndex];
+  qTitle.textContent = q.title;
+  qCounter.textContent = (questionIndex+1) + ' / ' + QUESTIONS.length;
+  qInput.value = answers[q.key] || '';
+  qNextBtn.disabled = qInput.value.trim().length === 0;
+  qNextBtn.textContent = (questionIndex === QUESTIONS.length-1) ? "Let's play →" : 'Next →';
+  qInput.focus();
+}
+
+qInput.addEventListener('input', ()=>{
+  qNextBtn.disabled = qInput.value.trim().length === 0;
+});
+
+// Allow pressing Enter to advance
+qInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && !qNextBtn.disabled){ qNextBtn.click(); }
+});
+
+qNextBtn.addEventListener('click', ()=>{
+  const q = QUESTIONS[questionIndex];
+  answers[q.key] = qInput.value.trim();
+  saveAnswersToStorage();
+  advanceStep();
+
+  if(questionIndex < QUESTIONS.length-1){
+    questionIndex++;
+    renderQuestion();
+  } else {
+    showScreen('screen-quiz');
+    renderQuiz();
+  }
+});
+
+/* ============================================================
+   3. COUPLE QUIZ
+   ============================================================ */
+const quizTitle = document.getElementById('quiz-title');
+const quizCounter = document.getElementById('quiz-counter');
+const quizChoices = document.getElementById('quiz-choices');
+
+function renderQuiz(){
+  const item = QUIZ[quizIndex];
+  quizTitle.textContent = item.title;
+  quizCounter.textContent = (quizIndex+1) + ' / ' + QUIZ.length;
+  quizChoices.innerHTML = '';
+
+  [item.a, item.b].forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = '<span class="choice-emoji">'+opt.emoji+'</span>'+opt.label;
+    btn.addEventListener('click', ()=> selectQuizOption(btn, item.key, opt.label));
+    quizChoices.appendChild(btn);
+  });
+}
+
+function selectQuizOption(btn, key, label){
+  // Visually mark the chosen option
+  Array.from(quizChoices.children).forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  quizAnswers[key] = label;
+  saveAnswersToStorage();
+  advanceStep();
+
+  // Brief pause so the selection animation is visible, then move on
+  setTimeout(()=>{
+    if(quizIndex < QUIZ.length-1){
+      quizIndex++;
+      renderQuiz();
+    } else {
+      showScreen('screen-letter');
+      startLoveLetter();
+    }
+  }, 550);
+}
+
+/* ============================================================
+   4. LOVE LETTER — typewriter effect + answer cards
+   ============================================================ */
+const letterTextEl = document.getElementById('letter-text');
+const answersGrid = document.getElementById('answers-grid');
+const letterNextBtn = document.getElementById('letter-next-btn');
+let letterStarted = false;
+
+function startLoveLetter(){
+  if(letterStarted) return; // only run once
+  letterStarted = true;
+
+  letterTextEl.innerHTML = '<span class="cursor"></span>';
+  let i = 0;
+
+  const typeInterval = setInterval(()=>{
+    if(i < LOVE_LETTER_TEXT.length){
+      letterTextEl.textContent = LOVE_LETTER_TEXT.slice(0, i+1);
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      letterTextEl.appendChild(cursor);
+      i++;
+    } else {
+      clearInterval(typeInterval);
+      renderAnswerCards();
+      letterNextBtn.style.display = 'inline-block';
+      advanceStep();
+    }
+  }, 45);
+}
+
+function renderAnswerCards(){
+  answersGrid.innerHTML = '';
+  const cardData = [
+    { label:'Nickname', value:answers.nickname },
+    { label:'Favorite Flower', value:answers.flower },
+    { label:'Favorite Dessert', value:answers.dessert },
+    { label:'Favorite Season', value:answers.season },
+    { label:'Dream Trip', value:answers.travel },
+    { label:'Beach or Mountains', value:quizAnswers.place },
+    { label:'Morning or Night', value:quizAnswers.time },
+    { label:'Hug or Kiss', value:quizAnswers.affection },
+    { label:'Date Night', value:quizAnswers.date },
+    { label:'Home or Travel', value:quizAnswers.lifestyle }
+  ];
+
+  cardData.forEach((c, idx)=>{
+    if(!c.value) return;
+    const card = document.createElement('div');
+    card.className = 'answer-card';
+    card.style.animationDelay = (idx*0.08) + 's';
+    card.innerHTML = '<div class="label">'+c.label+'</div><div class="value">'+c.value+'</div>';
+    answersGrid.appendChild(card);
+  });
+}
+
+letterNextBtn.addEventListener('click', ()=>{
+  showScreen('screen-final');
+});
+
+/* ============================================================
+   5. FINAL SCREEN — celebration effects
+   ============================================================ */
+document.getElementById('btn-always').addEventListener('click', celebrate);
+document.getElementById('btn-forever').addEventListener('click', celebrate);
+
+function celebrate(){
+  advanceStep();
+  document.getElementById('glow-message').style.display = 'block';
+  heartBurst(30);
+  launchConfetti();
+  launchFireworks();
+}
+
+/* ============================================================
+   CANVAS EFFECTS — confetti & fireworks (pure vanilla JS)
+   ============================================================ */
+const canvas = document.getElementById('effects-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let particles = []; // shared particle pool for confetti + firework sparks
+
+const CONFETTI_COLORS = ['#ff6fa5','#ff2d55','#ffb8d1','#ffffff','#ff8fb8'];
+
+function launchConfetti(){
+  const count = 140;
+  for(let i=0;i<count;i++){
+    particles.push({
+      type:'confetti',
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*canvas.height*0.3,
+      vx: (Math.random()-0.5)*3,
+      vy: 2 + Math.random()*3,
+      size: 6 + Math.random()*6,
+      color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+      rotation: Math.random()*360,
+      rotSpeed: (Math.random()-0.5)*10,
+      life: 0,
+      maxLife: 260
+    });
+  }
+}
+
+function launchFireworks(){
+  // Launch a handful of firework bursts at staggered times/positions
+  const bursts = 5;
+  for(let b=0; b<bursts; b++){
+    setTimeout(()=>{
+      const cx = canvas.width * (0.2 + Math.random()*0.6);
+      const cy = canvas.height * (0.2 + Math.random()*0.35);
+      const sparkCount = 60;
+      const color = CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)];
+      for(let i=0;i<sparkCount;i++){
+        const angle = (Math.PI*2*i)/sparkCount;
+        const speed = 2 + Math.random()*3;
+        particles.push({
+          type:'spark',
+          x: cx, y: cy,
+          vx: Math.cos(angle)*speed,
+          vy: Math.sin(angle)*speed,
+          size: 2.5,
+          color: color,
+          life: 0,
+          maxLife: 70
+        });
+      }
+    }, b*400);
+  }
+}
+
+function updateAndDrawParticles(){
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+
+  particles.forEach(p=>{
+    p.life++;
+    if(p.type === 'confetti'){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.03; // gravity
+      p.rotation += p.rotSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - p.life/p.maxLife);
+      ctx.fillRect(-p.size/2, -p.size/4, p.size, p.size/2);
+      ctx.restore();
+    } else if(p.type === 'spark'){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.02;
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - p.life/p.maxLife);
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  // Remove dead particles
+  particles = particles.filter(p => p.life < p.maxLife && p.y < canvas.height + 50);
+
+  requestAnimationFrame(updateAndDrawParticles);
+}
+requestAnimationFrame(updateAndDrawParticles);
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadAnswersFromStorage();
+updateProgress();
+</script>
+</body>
+</html>
